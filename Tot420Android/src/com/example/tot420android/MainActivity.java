@@ -1,27 +1,150 @@
 package com.example.tot420android;
 
-import android.os.Bundle;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
+ 
 import android.app.Activity;
-import android.view.Menu;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		
-		int tala;
-		tala = 0;
-		if (tala==0)
-			;
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_main, menu);
-		return true;
-	}
+	TextView textlog;//Log for outputs
+	 
+    Button buttonConnect;//(dis)connect Button
+    SeekBar seekBar;//Seekbar to control the Servo
+    TextView seekBarValue;//Textfield displaing the Value of the seekbar
+ 
+    Boolean connected=false;//stores the connectionstatus
+ 
+    DataOutputStream dataOutputStream = null;//outputstream to send commands
+    Socket socket = null;//the socket for the connection
+ 
+    
+    
+    // *******************
+    // ** Called when the activity is first created.
+    // *******************
+    
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+ 
+        //connect the view and the objects
+        buttonConnect = (Button)findViewById(R.id.button1);
+        textlog = (TextView)findViewById(R.id.textView3);
+        seekBar = (SeekBar)findViewById(R.id.seekBar1);
+        //seekBarValue = (TextView)findViewById(R.id.seekbarvalue);
+ 
+        textlog.setText("Starting Client");//log that the App launched
+        changeConnectionStatus(false);//change connectionstatus to "disconnected"
+ 
+        //Eventlisteners
+        buttonConnect.setOnClickListener(buttonConnectOnClickListener);
+        seekBar.setOnSeekBarChangeListener(seekbarchangedListener);
+    }
+    
+    
+    
+    // *******************
+    // ** SEEKBAR EVENTLISTENER
+    // *******************
+    
+    SeekBar.OnSeekBarChangeListener seekbarchangedListener = new SeekBar.OnSeekBarChangeListener(){
+        //Methd is fired everytime the seekbar is changed
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            String valueOfseekbar = String.valueOf(progress);//save the value of the seekbar in a string
+            seekBarValue.setText(valueOfseekbar);//update the value in the textfield
+ 
+             if(connected){//if the socket is connected
+                 try {
+                     //send a string to the Arduino Server in the form of "set: -seekbarvalue- \n"
+                     dataOutputStream.writeBytes("set:"+valueOfseekbar+'\n');
+                 }catch (UnknownHostException e) {//catch and
+                     outputText(e.getMessage());//display errors
+                 } catch (IOException e) {//catch and
+                     outputText(e.getMessage());//display errors
+                 }
+             }
+        }
+ 
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+        }
+ 
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+        }
+    };
+    
+    
+    
+    // *******************
+    // ** CONNECTION BUTTON EVENTLISTENER
+    // *******************
+    
+    Button.OnClickListener buttonConnectOnClickListener = new Button.OnClickListener(){
+        @Override
+        public void onClick(View arg0) {
+            if(!connected){//if not connected yet
+                outputText("connecting to Server");
+                 try {//try to create a socket and outputstream
+                      socket = new Socket("192.168.195.214", 8888);//create a socket
+                      dataOutputStream = new DataOutputStream(socket.getOutputStream());//and stream
+                      outputText("successfully connected");//output the connection status
+                      changeConnectionStatus(true);//change the connection status
+                 } catch (UnknownHostException e) {//catch and
+                      outputText(e.getMessage());//display errors
+                      changeConnectionStatus(false);
+                 } catch (IOException e) {//catch and
+                     outputText(e.getMessage());//display errors
+                     changeConnectionStatus(false);
+                 }
+            }else{
+                outputText("disconnecting from Server...");
+                try {//try to close the socket
+                      socket.close();
+                      outputText("successfully disconnected");
+                      changeConnectionStatus(false);//change the connection status
+                 } catch (UnknownHostException e) {//catch and
+                      outputText(e.getMessage());//display errors
+                 } catch (IOException e) {//catch and
+                      outputText(e.getMessage());//display errors
+                 }
+            }
+    }};
+    
+    
+    
+    // *******************
+    // **  Method changes the connection status
+    // *******************
+    
+    public void changeConnectionStatus(Boolean isConnected) {
+        connected=isConnected;//change variable
+        seekBar.setEnabled(isConnected);//enable/disable seekbar
+        if(isConnected){//if connection established
+            buttonConnect.setText("disconnect");//change Buttontext
+        }else{
+            buttonConnect.setText("connect");//change Buttontext
+        }
+    }
+    
+    
+ 
+    // *******************
+    // **  Method appends text to the textfield and adds a newline character
+    // *******************
+ 
+    public void outputText(String msg) {
+        textlog.append(msg+"\n");
+    }
 
 }
