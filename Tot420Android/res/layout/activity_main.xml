@@ -6,6 +6,7 @@
     android:orientation="vertical"
     tools:context=".MainActivity" >
 
+    
     <TextView
         android:id="@+id/textView1"
         android:layout_width="fill_parent"
@@ -43,10 +44,21 @@
         android:layout_height="wrap_content"
         android:text="Console" />
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="" />
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>
