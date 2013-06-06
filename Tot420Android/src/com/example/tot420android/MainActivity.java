@@ -18,12 +18,12 @@ public class MainActivity extends Activity {
 		TextView textlog;//Log for outputs
 		
 		Button buttonConnect;//(dis)connect Button
-		SeekBar seekBar;//Seekbar to control the Servo
-		SeekBar seekBar2;//Seekbar to control the Servo
-		SeekBar seekBar3;//Seekbar to control the Servo
-		TextView seekBarValue;//Textfield displaing the Value of the seekbar
-		TextView seekBarValue2;//Textfield displaing the Value of the seekbar
-		TextView seekBarValue3;//Textfield displaing the Value of the seekbar
+		SeekBar seekBar;//Seekbar to get value to be sent to Netduino
+		SeekBar seekBar2;//Seekbar2 to get value to be sent to Netduino
+		SeekBar seekBar3;//Seekbar3 to get value to be sent to Netduino
+		TextView seekBarValue;//Textfield displaing the Value of seekbar
+		TextView seekBarValue2;//Textfield displaing the Value of seekbar2
+		TextView seekBarValue3;//Textfield displaing the Value of seekbar3
 		
 		Boolean connected=false;//stores the connectionstatus
 		
@@ -32,9 +32,11 @@ public class MainActivity extends Activity {
 		
 		
 		
-		//-----------------
+		//-----------------------------------------
+		//
 		//Called when the activity is first created. 
-		//------------------
+		//
+		//------------------------------------------
 	    @Override
 	    public void onCreate(Bundle savedInstanceState) {
 	        super.onCreate(savedInstanceState);
@@ -62,9 +64,11 @@ public class MainActivity extends Activity {
 	    
 	    
 	    
-	    // ----------------------- 
-	    //SEEKBAR EVENTLISTENER - begin 
-	    //----------------------------
+	    // -----------------------------------------
+	    //
+	    //SEEKBAR EVENTLISTENER 
+	    //
+	    //------------------------------------------
 	    SeekBar.OnSeekBarChangeListener seekbarchangedListener = new SeekBar.OnSeekBarChangeListener(){
 	    	//Methd is fired everytime the seekbar is changed
 	    	@Override
@@ -74,12 +78,12 @@ public class MainActivity extends Activity {
 	    		
 		 	    if(connected){//if the socket is connected
 		 	    	try {
-		 	    		//send a string to the Arduino Server in the form of "set: -seekbarvalue- \n"
+		 	    		//send a string to the Netduino Server in the form of "A -seekbarvalue- \n"
 		 	    		dataOutputStream.writeBytes("A"+valueOfseekbar+'\n');
 		 	    	}catch (UnknownHostException e) {//catch and
-		 	    		outputText(e.getMessage());//display errors
+		 	    		outputText(e.getMessage());//display errors in console
 		 			} catch (IOException e) {//catch and
-		 				outputText(e.getMessage());//display errors
+		 				outputText(e.getMessage());//display errors in console
 		 			}
 		 	    }
 	 	   }
@@ -94,9 +98,11 @@ public class MainActivity extends Activity {
 	    };
 	    
 	    
-	 // ----------------------- 
-	    //SEEKBAR EVENTLISTENER - begin 
-	    //----------------------------
+	    // --------------------------------------
+	    //
+	    //SEEKBAR 2 EVENTLISTENER
+	    //
+	    //--------------------------------------
 	    SeekBar.OnSeekBarChangeListener seekbarchangedListener2 = new SeekBar.OnSeekBarChangeListener(){
 	    	//Methd is fired everytime the seekbar is changed
 	    	@Override
@@ -106,7 +112,7 @@ public class MainActivity extends Activity {
 	    		
 		 	    if(connected){//if the socket is connected
 		 	    	try {
-		 	    		//send a string to the Arduino Server in the form of "set: -seekbarvalue- \n"
+		 	    		//send a string to the Netduino Server in the form of "B -seekbarvalue- \n"
 		 	    		dataOutputStream.writeBytes("B"+valueOfseekbar+'\n');
 		 	    	}catch (UnknownHostException e) {//catch and
 		 	    		outputText(e.getMessage());//display errors
@@ -127,9 +133,11 @@ public class MainActivity extends Activity {
 	    
 	    
 	    
-	 // ----------------------- 
-	    //SEEKBAR EVENTLISTENER - begin 
-	    //----------------------------
+	    // ----------------------------------------
+	    //
+	    //SEEKBAR 3 EVENTLISTENER
+	    //
+	    //------------------------------------------
 	    SeekBar.OnSeekBarChangeListener seekbarchangedListener3 = new SeekBar.OnSeekBarChangeListener(){
 	    	//Methd is fired everytime the seekbar is changed
 	    	@Override
@@ -139,7 +147,7 @@ public class MainActivity extends Activity {
 	    		
 		 	    if(connected){//if the socket is connected
 		 	    	try {
-		 	    		//send a string to the Arduino Server in the form of "set: -seekbarvalue- \n"
+		 	    		//send a string to the Netduino Server in the form of "C -seekbarvalue- \n"
 		 	    		dataOutputStream.writeBytes("C"+valueOfseekbar+'\n');
 		 	    	}catch (UnknownHostException e) {//catch and
 		 	    		outputText(e.getMessage());//display errors
@@ -159,9 +167,11 @@ public class MainActivity extends Activity {
 	    };
 	    
 	    
-	    // ----------------------- 
-	    //CONNECTION BUTTON EVENTLISTENER - begin 
-	    //----------------------------
+	    // ------------------------------------------
+	    //
+	    //CONNECTION BUTTON EVENTLISTENER
+	    //
+	    //-------------------------------------------
 	    Button.OnClickListener buttonConnectOnClickListener = new Button.OnClickListener(){
 			@Override
 			public void onClick(View arg0) {
@@ -195,14 +205,16 @@ public class MainActivity extends Activity {
 		
 		
 		
-		//------------------------
+		//-----------------------------------------
+		//
 		// Method changes the connection status
-		//------------------------
+		//
+		//-----------------------------------------
 		public void changeConnectionStatus(Boolean isConnected) {
 			connected=isConnected;//change variable
 			seekBar.setEnabled(isConnected);//enable/disable seekbar
-			seekBar2.setEnabled(isConnected);//enable/disable seekbar
-			seekBar3.setEnabled(isConnected);//enable/disable seekbar
+			seekBar2.setEnabled(isConnected);//enable/disable seekbar 2
+			seekBar3.setEnabled(isConnected);//enable/disable seekbar 3
 			if(isConnected){//if connection established
 				buttonConnect.setText("disconnect");//change Buttontext
 			}else{
@@ -211,22 +223,26 @@ public class MainActivity extends Activity {
 		}
 		
 		
-		//------------------------
+		//-----------------------------------------------------------------
+		//
 		//Method appends text to the textfield and adds a newline character
-		//------------------------
+		//
+		//-------------------------------------------------------------------
 		public void outputText(String msg) {
 			textlog.append(msg+"\n");
 		}
 		
 		
 		
-		//------------------------
+		//---------------------------------------------
+		//
 		//Called when the activity is destroied. 
-		//------------------------
+		//
+		//-----------------------------------------------
 		@Override
 	    public void onDestroy() {
 			if(connected)
-				try {
+				try {//try to close the socket
 					socket.close();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
